@@ -8,6 +8,7 @@ jobs:
   Explore-GitHub-Actions:
     if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
       - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
@@ -19,4 +20,7 @@ jobs:
       - name: List files in the repository
         run: |
           ls ${{ github.workspace }}
+      - name: Simulate deploy to production
+        run: echo "🚀 Simulating deployment to the production environment..."
       - run: echo "🍏 This job's status is ${{ job.status }}."
+      

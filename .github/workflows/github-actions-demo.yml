@@ -3,23 +3,28 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
   #push:
   pull_request:
-    types: [closed]
+    types: [opened, closed, synchronize]
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: production
-    #if: github.event_name != 'pull_request' || github.event.pull_request.merged == true
+    environment: Production
     steps:
-    #  - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
-    #  - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
-    #  - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
-    #  - name: Check out repository code
-    #    uses: actions/checkout@v5
-    #  - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
-    #  - run: echo "🖥️ The workflow is now ready to test your code on the runner."
-    #  - name: List files in the repository
-    #    run: |
-    #      ls ${{ github.workspace }}
+      - name: Wait for merge if not merged
+        id: wait_for_merge
+        run: |
+          if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
+            echo "Pull request not merged. Waiting 5 minutes before checking again..."
+            sleep 300
+            # Fetch PR status again using GitHub API
+            pr_number=${{ github.event.pull_request.number }}
+            repo=${{ github.repository }}
+            merged=$(gh pr view $pr_number --repo $repo --json merged --jq .merged)
+            if [[ "$merged" != "true" ]]; then
+              echo "Pull request still not merged after waiting. Exiting."
+              exit 1
+            fi
+          fi
       - name: Simulate deploy to production
+        if: success()
         run: echo "🚀 Simulating deployment to the production environment..."
-      - run: echo "🍏 This job's status is ${{ job.status }}." 
+      - run: echo "🍏 This job's status is ${{ job.status }}."

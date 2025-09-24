@@ -1,0 +1,23 @@
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run deployment
+        run: ./deploy.sh
+
+      - name: Create Jira Change Ticket
+        uses: curlimages/curl:latest
+        with:
+          args: >
+            -X POST
+            -H "Authorization: Basic ${{ secrets.JIRA_AUTH }}"
+            -H "Content-Type: application/json"
+            --data '{
+              "fields": {
+                "project": { "key": "ITSM" },
+                "issuetype": { "name": "Change" },
+                "summary": "Deployment to Production from GitHub",
+                "description": "Deployment commit: ${{ github.sha }} by ${{ github.actor }}"
+              }
+            }'
+            https://your-domain.atlassian.net/rest/api/3/issue

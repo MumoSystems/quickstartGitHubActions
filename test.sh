@@ -1,1 +1,1 @@
-echo "testing more and more again and again"
+echo "testing Wednesday MSD-22"

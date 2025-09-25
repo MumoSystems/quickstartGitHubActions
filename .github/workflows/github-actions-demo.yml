@@ -1,13 +1,22 @@
-name: GitHub Actions Demo
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+name: Marketing GitHub Actions Demo
+run-name: ${{ github.actor }} is demonstrating GitHub Actions 🚀
 on:
   push:
-  #pull_request:
-    #types: [opened, closed, synchronize]
+  pull_request:
+    types: closed
 jobs:
-  deploy:
+  push_job:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    environment: Testing
+    steps:
+      - name: Push event step
+        run: echo "🚀 This job runs only on push events!"
+
+  deploy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: 
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
     steps:
       - name: Wait for merge if not merged
         id: wait_for_merge

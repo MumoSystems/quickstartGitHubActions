@@ -1,13 +1,13 @@
 name: GitHub Actions Demo
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on:
-  #push:
-  pull_request:
-    types: [opened, closed, synchronize]
+  push:
+  #pull_request:
+    #types: [opened, closed, synchronize]
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment: Production
+    environment: Testing
     steps:
       - name: Wait for merge if not merged
         id: wait_for_merge

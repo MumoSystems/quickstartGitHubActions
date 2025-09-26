@@ -1,1 +1,1 @@
-echo "testing jira work item creation"
+echo "testing jira work item craetion"

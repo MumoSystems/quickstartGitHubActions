@@ -137,9 +137,9 @@ func main() {
 				GroupID string `json:"groupId"`
 				Self    string `json:"self"`
 			}{
-				Name:    "github-approvers",
-				GroupID: "9065085a-249c-4164-a340-bf559a6e943a",
-				Self:    fmt.Sprintf("%srest/api/3/group?groupId=9065085a-249c-4164-a340-bf559a6e943a", jiraURL),
+				Name:    "Change Management Board",
+				GroupID: "5cd2dde1-4263-4b63-8e48-920e1e672e29",
+				Self:    fmt.Sprintf("%srest/api/3/group?groupId=5cd2dde1-4263-4b63-8e48-920e1e672e29", jiraURL),
 			},
 		},
 	}

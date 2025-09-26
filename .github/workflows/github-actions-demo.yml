@@ -11,29 +11,46 @@ jobs:
     steps:
       - name: Push event step
         run: echo "🚀 This job runs only on push events!"
-
-  deploy:
+  pr_job:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: 
       name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
     steps:
-      - name: Wait for merge if not merged
-        id: wait_for_merge
-        run: |
-          if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
-            echo "Pull request not merged. Waiting 5 minutes before checking again..."
-            sleep 300
-            # Fetch PR status again using GitHub API
-            pr_number=${{ github.event.pull_request.number }}
-            repo=${{ github.repository }}
-            merged=$(gh pr view $pr_number --repo $repo --json merged --jq .merged)
-            if [[ "$merged" != "true" ]]; then
-              echo "Pull request still not merged after waiting. Exiting."
-              exit 1
-            fi
-          fi
-      - name: Simulate deploy to production
-        if: success()
-        run: echo "🚀 Simulating deployment to the production environment..."
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Update action files
+        uses: ekyalangalilwa/goaction@v1.2.3.4.5
+        with:
+          name: goaction-example
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
+      - name: Create Change Work Item in Jira
+        uses: ./
+        env:
+          JIRA_URL: https://one-atlas-qxfz.atlassian.net/
+          JIRA_API_TOKEN: ${{ secrets.API_TOKEN }}
+          JIRA_USERNAME: mkelly@mumosystems.com
+          JIRA_ISSUE_DESCRIPTION: Change ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }} ${{ github.event.pull_request.number }} ${{ github.repository }}
+          JIRA_ISSUE_SUMMARY: Change ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }} ${{ github.event.pull_request.number }} ${{ github.repository }}
+          JIRA_ISSUE_TYPE: 10009
+          JIRA_PROJECT: MS
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #- name: Wait for merge if not merged
+      #  id: wait_for_merge
+      #  run: |
+      #    if [[ "${{ github.event.pull_request.merged }}" != "true" ]]; then
+      #      echo "Pull request not merged. Waiting 5 minutes before checking again..."
+      #      sleep 300
+      #      # Fetch PR status again using GitHub API
+      #      pr_number=${{ github.event.pull_request.number }}
+      #      repo=${{ github.repository }}
+      #      merged=$(gh pr view $pr_number --repo $repo --json merged --jq .merged)
+      #      if [[ "$merged" != "true" ]]; then
+      #        echo "Pull request still not merged after waiting. Exiting."
+      #        exit 1
+      #      fi
+      #    fi    
+      #- name: Simulate deploy to production
+      #  if: success()
+      #  run: echo "🚀 Simulating deployment to the production environment..."
+      #- run: echo "🍏 This job's status is ${{ job.status }}."

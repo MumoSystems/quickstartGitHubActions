@@ -49,7 +49,7 @@ type JiraIssueFields struct {
 			} `json:"content"`
 		} `json:"content"`
 	} `json:"description"`
-	GithubPRID string `json:"customfield_10538"`
+	GithubPRID string `json:"customfield_10533"`
 	Type       struct {
 		ID string `json:"id"`
 	} `json:"issuetype"`
@@ -139,7 +139,7 @@ func main() {
 			}{
 				Name:    "github-approvers",
 				GroupID: "9065085a-249c-4164-a340-bf559a6e943a",
-				Self:    "https://one-atlas-ygdd.atlassian.net/rest/api/3/group?groupId=9065085a-249c-4164-a340-bf559a6e943a",
+				Self:    fmt.Sprintf("%srest/api/3/group?groupId=9065085a-249c-4164-a340-bf559a6e943a", URL),
 			},
 		},
 	}

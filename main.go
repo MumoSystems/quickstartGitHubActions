@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/google/go-github/v31/github"
 	"github.com/imroc/req/v3"
 	"github.com/posener/goaction"
 	"github.com/posener/goaction/actionutil"
@@ -172,7 +173,20 @@ func main() {
 		log.Printf("Error response: %s", resp.String())
 		return
 	}
-	log.Printf("Issue created: %s", result.Self)
+	if resp.StatusCode == 201 {
+		log.Printf("Issue created: %s", result.Self)
+		_, _, err := gh.IssuesCreateComment(
+			ctx,
+			*prEvent.Number,
+			&github.IssueComment{
+				Body: github.String(fmt.Sprintf("Change work item created: %sbrowse/%s", jiraURL, result.Key)),
+			},
+		)
+		if err != nil {
+			log.Printf("Failed to create pr comment: %v", err)
+			return
+		}
+	}
 }
 
 // buildIssuePayload builds the Jira issue payload.
@@ -285,11 +299,32 @@ func buildIssuePayload(
 				},
 			},
 		}
+	} else {
+		issue.Update.IssueLinks = []struct {
+			Add struct {
+				Values []struct {
+					Type struct {
+						Name string `json:"name"`
+					} `json:"type"`
+					OutwardIssues []struct {
+						Key string `json:"key"`
+					} `json:"outwardIssues"`
+				} `json:"values"`
+			} `json:"add"`
+		}{}
 	}
 
 	// Add approver groups
 	if len(approverGroups) > 0 {
 		issue.Update.ApproverGroups = approverGroups
+	} else {
+		issue.Update.ApproverGroups = []struct {
+			Add struct {
+				Name    string `json:"name"`
+				GroupID string `json:"groupId"`
+				Self    string `json:"self"`
+			} `json:"add"`
+		}{}
 	}
 
 	return issue

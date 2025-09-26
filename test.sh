@@ -1,1 +1,1 @@
-echo "testing Wednesday MSD-22"
+echo "testing jira work item craetion"

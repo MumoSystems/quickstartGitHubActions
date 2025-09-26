@@ -123,7 +123,6 @@ func main() {
 	}
 
 	githubPRID := strconv.Itoa(*prEvent.Number)
-
 	// Define approver groups
 	approverGroups := []struct {
 		Add struct {
@@ -140,7 +139,7 @@ func main() {
 			}{
 				Name:    "github-approvers",
 				GroupID: "9065085a-249c-4164-a340-bf559a6e943a",
-				Self:    fmt.Sprintf("%srest/api/3/group?groupId=9065085a-249c-4164-a340-bf559a6e943a", URL),
+				Self:    fmt.Sprintf("%srest/api/3/group?groupId=9065085a-249c-4164-a340-bf559a6e943a", jiraURL),
 			},
 		},
 	}

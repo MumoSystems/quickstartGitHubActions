@@ -95,7 +95,7 @@ func main() {
 
 	gh := actionutil.NewClientWithToken(ctx, token)
 	re := regexp.MustCompile(`[A-Z]{2,}-\d+`)
-	commits, _, err := gh.PullRequests.ListCommits(ctx, "mumosystems", "test", *prEvent.Number, nil)
+	commits, _, err := gh.PullRequests.ListCommits(ctx, "mumosystems", "quickstartGitHubActions", *prEvent.Number, nil)
 	if err != nil {
 		log.Fatalf("Failed to fetch commits: %v", err)
 	}

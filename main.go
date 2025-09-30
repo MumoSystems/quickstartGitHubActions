@@ -51,14 +51,18 @@ type JiraIssueFields struct {
 			} `json:"content"`
 		} `json:"content"`
 	} `json:"description"`
-	GithubPRID string `json:"customfield_10533"`
-	Type       struct {
+	GithubPRID  string `json:"customfield_10533"`
+	RequestType string `json:"customfield_10010"`
+	Type        struct {
 		ID string `json:"id"`
 	} `json:"issuetype"`
 	Project struct {
 		Key string `json:"key"`
 	} `json:"project"`
-	Summary string `json:"summary"`
+	Summary          string `json:"summary"`
+	AffectedServices []struct {
+		ID string `json:"id"`
+	} `json:"customfield_10039"`
 }
 
 type IssueResponse struct {
@@ -86,6 +90,8 @@ func main() {
 	jiraIssueSummary := os.Getenv("JIRA_ISSUE_SUMMARY")
 	jiraIssueTypeID := os.Getenv("JIRA_ISSUE_TYPE")
 	jiraProject := os.Getenv("JIRA_PROJECT")
+	affectedServiceID := os.Getenv("AFFECTED_SERVICE_ID")
+	requestTypeID := os.Getenv("REQUEST_TYPE_ID")
 	token := os.Getenv("GITHUB_TOKEN")
 
 	prEvent, err := goaction.GetPullRequest()
@@ -145,14 +151,23 @@ func main() {
 		},
 	}
 
+	// Define affected services
+	affectedServices := []struct {
+		ID string `json:"id"`
+	}{
+		{ID: affectedServiceID},
+	}
+
 	issue := buildIssuePayload(
 		jiraIssueDescription,
 		jiraIssueSummary,
 		jiraIssueTypeID,
+		requestTypeID,
 		jiraProject,
 		githubPRID,
 		outwardIssues,
 		approverGroups,
+		affectedServices,
 	)
 
 	// Initialize the Jira client
@@ -191,7 +206,7 @@ func main() {
 
 // buildIssuePayload builds the Jira issue payload.
 func buildIssuePayload(
-	jiraIssueDescription, jiraIssueSummary, jiraIssueTypeID, jiraProject, githubPRID string,
+	jiraIssueDescription, jiraIssueSummary, jiraIssueTypeID, requestTypeID, jiraProject, githubPRID string,
 	outwardIssues []struct {
 		Key string `json:"key"`
 	},
@@ -201,6 +216,9 @@ func buildIssuePayload(
 			GroupID string `json:"groupId"`
 			Self    string `json:"self"`
 		} `json:"add"`
+	},
+	affectedServices []struct {
+		ID string `json:"id"`
 	},
 ) JiraIssue {
 	issue := JiraIssue{
@@ -249,8 +267,10 @@ func buildIssuePayload(
 			}{
 				Key: jiraProject,
 			},
-			Summary:    jiraIssueSummary,
-			GithubPRID: githubPRID,
+			Summary:          jiraIssueSummary,
+			GithubPRID:       githubPRID,
+			RequestType:      requestTypeID,
+			AffectedServices: affectedServices,
 		},
 	}
 

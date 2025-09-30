@@ -3,8 +3,15 @@ run-name: ${{ github.actor }} is demonstrating GitHub Actions 🚀
 on:
   push:
   pull_request:
-    types: closed
 jobs:
+  deploy:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: 
+      name: production
+    steps:
+      - name: Simulate deploy
+        run: echo "🚀 Simulating deployment to the ${{ github.ref == 'refs/heads/main' && 'production' || 'develop' }} environment..."
   push_job:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -15,7 +22,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: 
-      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'develop' }}
     steps:
       - name: Check out repository
         uses: actions/checkout@v5

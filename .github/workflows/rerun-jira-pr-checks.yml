@@ -1,0 +1,20 @@
+name: Rerun Jira PR Checks
+
+on:
+  schedule:
+    - cron: '*/5 * * * *'
+  workflow_dispatch:
+
+jobs:
+  rerun-pr-check:
+    name: Rerun Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      - name: Rerun checks
+        run: ./rerun-jira-pr-checks
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          REPO_OWNER: mumosystems
+          REPO: quickstartGitHubActions

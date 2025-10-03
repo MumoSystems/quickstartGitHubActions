@@ -7,6 +7,7 @@ on:
   workflow_dispatch:
 jobs:
   check-work-item-approval:
+    name: Check Work Item Approval
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     environment: 
